@@ -56,6 +56,14 @@ class Ui_Tela_Cadastro(object):
         self.line_nome.setObjectName(u"line_nome")
         self.line_nome.setGeometry(QRect(100, 160, 551, 22))
 
+        # Asterisco para Nome
+        self.asterisco_nome = QLabel(self.frame)
+        self.asterisco_nome.setObjectName(u"asterisco_nome")
+        self.asterisco_nome.setGeometry(QRect(140, 140, 10, 16))
+        self.asterisco_nome.setText("*")
+        self.asterisco_nome.setFont(QFont("Arial", 12))
+        self.asterisco_nome.setStyleSheet("color: red;")
+
         # Campo de Email
         self.txt_email = QLabel(self.frame)
         self.txt_email.setObjectName(u"txt_email")
@@ -65,6 +73,14 @@ class Ui_Tela_Cadastro(object):
         self.line_email.setObjectName(u"line_email")
         self.line_email.setGeometry(QRect(100, 220, 551, 22))
 
+        # Asterisco para Email
+        self.asterisco_email = QLabel(self.frame)
+        self.asterisco_email.setObjectName(u"asterisco_email")
+        self.asterisco_email.setGeometry(QRect(140, 200, 10, 16))
+        self.asterisco_email.setText("*")
+        self.asterisco_email.setFont(QFont("Arial", 12))
+        self.asterisco_email.setStyleSheet("color: red;")
+
         # Campo de Contato
         self.txt_contato = QLabel(self.frame)
         self.txt_contato.setObjectName(u"txt_contato")
@@ -73,6 +89,15 @@ class Ui_Tela_Cadastro(object):
         self.line_contato = QLineEdit(self.frame)
         self.line_contato.setObjectName(u"line_contato")
         self.line_contato.setGeometry(QRect(100, 280, 551, 22))
+        self.line_contato.setInputMask("(99) 99999-9999")
+
+        # # Asterisco para Contato
+        # self.asterisco_contato = QLabel(self.frame)
+        # self.asterisco_contato.setObjectName(u"asterisco_contato")
+        # self.asterisco_contato.setGeometry(QRect(151, 260, 10, 16))
+        # self.asterisco_contato.setText("*")
+        # self.asterisco_contato.setFont(QFont("Arial", 12))
+        # self.asterisco_contato.setStyleSheet("color: red;")
 
         # Campo de Senha
         self.txt_senha = QLabel(self.frame)
@@ -84,6 +109,14 @@ class Ui_Tela_Cadastro(object):
         self.line_senha.setGeometry(QRect(100, 340, 551, 22))
         self.line_senha.setEchoMode(QLineEdit.Password)  # Ativando o EchoMode para ocultar a senha
 
+        # Asterisco para Senha
+        self.asterisco_senha = QLabel(self.frame)
+        self.asterisco_senha.setObjectName(u"asterisco_senha")
+        self.asterisco_senha.setGeometry(QRect(141, 320, 10, 16))
+        self.asterisco_senha.setText("*")
+        self.asterisco_senha.setFont(QFont("Arial", 12))
+        self.asterisco_senha.setStyleSheet("color: red;")
+
         # Campo de Confirmação de Senha
         self.txt_confrimar_senha = QLabel(self.frame)
         self.txt_confrimar_senha.setObjectName(u"txt_confrimar_senha")
@@ -93,6 +126,14 @@ class Ui_Tela_Cadastro(object):
         self.line_Confirmar_senha.setObjectName(u"line_Confirmar_senha")
         self.line_Confirmar_senha.setGeometry(QRect(100, 400, 551, 22))
         self.line_Confirmar_senha.setEchoMode(QLineEdit.Password)  # Ativando o EchoMode para ocultar a confirmação de senha
+
+        # Asterisco para Confirmação de Senha
+        self.asterisco_conf_senha = QLabel(self.frame)
+        self.asterisco_conf_senha.setObjectName(u"asterisco_conf_senha")
+        self.asterisco_conf_senha.setGeometry(QRect(243, 380, 10, 16))
+        self.asterisco_conf_senha.setText("*")
+        self.asterisco_conf_senha.setFont(QFont("Arial", 12))
+        self.asterisco_conf_senha.setStyleSheet("color: red;")
 
         # Botão de Cadastro
         self.pushButton_Cadastrar = QPushButton(self.frame)
@@ -147,13 +188,40 @@ class Ui_Tela_Cadastro(object):
         senha = self.line_senha.text()
         confirmar_senha = self.line_Confirmar_senha.text()
 
+        # Limpar bordas vermelhas antes de validar novamente
+        self.limpar_bordas()
+
+        # Validar se os campos estão vazios
         if senha != confirmar_senha:
             QMessageBox.warning(None, "Erro", "As senhas não coincidem. Tente novamente.")
-        elif nome == "" or email == "" or contato == "" or senha == "":
+        elif nome == "" or email == "" or contato == "" or senha == "" or confirmar_senha == "":
             QMessageBox.warning(None, "Erro", "Preencha todos os campos.")
+            self.validar_campos_vazios(nome, email, contato, senha, confirmar_senha)
         else:
             QMessageBox.information(None, "Sucesso", "Cadastro realizado com sucesso!")
             self.voltar_para_login()  # Volta para a tela de login após o cadastro
+
+    def limpar_bordas(self):
+        self.line_nome.setStyleSheet("")
+        self.line_email.setStyleSheet("")
+        self.line_contato.setStyleSheet("")
+        self.line_senha.setStyleSheet("")
+        self.line_Confirmar_senha.setStyleSheet("")
+
+    def validar_campos_vazios(self, nome, email, contato, senha, confirmar_senha):
+        # Destacar campos vazios com borda vermelha
+        if nome == "":
+            self.line_nome.setStyleSheet("border: 1px solid red;")
+        if email == "":
+            self.line_email.setStyleSheet("border: 1px solid red;")
+        if contato == "":
+            self.line_contato.setStyleSheet("border: 1px solid red;")
+        if senha == "":
+            self.line_senha.setStyleSheet("border: 1px solid red;")
+        if confirmar_senha == "":
+            self.line_Confirmar_senha.setStyleSheet("border: 1px solid red;")
+
+
 
 if __name__ == "__main__":
     app = QApplication([])  # Criação da aplicação

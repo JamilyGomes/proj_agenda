@@ -1,7 +1,7 @@
 from PySide6.QtCore import QCoreApplication, QMetaObject, QRect
 from PySide6.QtGui import QFont, QPixmap
 from PySide6.QtWidgets import QApplication, QFrame, QLabel, QLineEdit, QMainWindow, QPushButton, QWidget, QMessageBox
-
+ 
 class Ui_Tela_Login(object):
     def setupUi(self, Tela_Login):
         if not Tela_Login.objectName():
@@ -108,7 +108,6 @@ class Ui_Tela_Login(object):
 
         # Verificação simples (alterar conforme sua lógica de validação)
         if email == "betta@example.com" and senha == "123":
-            QMessageBox.information(None, "Sucesso", "Login realizado com sucesso!")
             self.close_window()  # Fechar a janela de login
             self.open_contact_screen()  # Chama a função para abrir a tela de contatos
         else:

@@ -2,7 +2,7 @@ import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from Tela_Login import Ui_Tela_Login
 from cadastro_proj import Ui_Tela_Cadastro
-
+ 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()

@@ -16,4 +16,4 @@ def adicionar_user(login, senha):
     cursor.execute(sql, valores)
     conexao.commit()
     cursor.close()
-    conexao.close()
+    conexao.close() 
