@@ -1,6 +1,6 @@
 from PySide6.QtCore import QCoreApplication, QMetaObject
 from PySide6.QtGui import QFont
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QFrame, QLineEdit, QLabel, QDateEdit, QVBoxLayout, QHBoxLayout, QTextEdit
+from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QFrame, QLineEdit, QLabel, QDateEdit, QTextEdit, QMessageBox
 
 class Ui_tela_add_contato(object):
     def setupUi(self, tela_add_contato, main_window):
@@ -16,7 +16,7 @@ class Ui_tela_add_contato(object):
         self.frame.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame.setFrameShadow(QFrame.Shadow.Raised)
         
-        
+        # Nome
         self.txt_nome = QLabel(self.frame)
         self.txt_nome.setObjectName(u"txt_nome")
         self.txt_nome.setGeometry(80, 60, 121, 16)
@@ -29,7 +29,7 @@ class Ui_tela_add_contato(object):
         self.line_nome.setObjectName(u"line_nome")
         self.line_nome.setGeometry(80, 80, 551, 22)
         
-        
+        # Contato
         self.txt_contato = QLabel(self.frame)
         self.txt_contato.setObjectName(u"txt_contato")
         self.txt_contato.setGeometry(80, 130, 121, 16)
@@ -37,9 +37,9 @@ class Ui_tela_add_contato(object):
         self.line_contato = QLineEdit(self.frame)
         self.line_contato.setObjectName(u"line_contato")
         self.line_contato.setGeometry(80, 150, 551, 22)
-
-        self.line_contato.setInputMask("(99) 99999-9999")
-
+        self.line_contato.setInputMask("(99) 99999-9999")  # Máscara de telefone
+        
+        # Email
         self.txt_email = QLabel(self.frame)
         self.txt_email.setObjectName(u"txt_email")
         self.txt_email.setGeometry(80, 200, 121, 16)
@@ -48,6 +48,7 @@ class Ui_tela_add_contato(object):
         self.line_email.setObjectName(u"line_email")
         self.line_email.setGeometry(80, 220, 551, 22)
         
+        # Data de Nascimento
         self.txt_data_nascimento = QLabel(self.frame)
         self.txt_data_nascimento.setObjectName(u"txt_data_nascimento")
         self.txt_data_nascimento.setGeometry(80, 270, 141, 16)
@@ -56,6 +57,7 @@ class Ui_tela_add_contato(object):
         self.dateEdit_Data_nascimento.setObjectName(u"dateEdit_Data_nascimento")
         self.dateEdit_Data_nascimento.setGeometry(80, 300, 110, 22)
         
+        # Perfil de Rede Social
         self.txt_perfil_rede_social = QLabel(self.frame)
         self.txt_perfil_rede_social.setObjectName(u"txt_perfil_rede_social")
         self.txt_perfil_rede_social.setGeometry(80, 350, 141, 16)
@@ -64,6 +66,7 @@ class Ui_tela_add_contato(object):
         self.line_perfil_rede_social.setObjectName(u"line_perfil_rede_social")
         self.line_perfil_rede_social.setGeometry(80, 370, 551, 22)
 
+        # Notas
         self.txt_notas = QLabel(self.frame)
         self.txt_notas.setObjectName(u"txt_notas")
         self.txt_notas.setGeometry(80, 420, 141, 16)
@@ -72,6 +75,7 @@ class Ui_tela_add_contato(object):
         self.textEdit_notas.setObjectName(u"textEdit_notas")
         self.textEdit_notas.setGeometry(80, 450, 551, 141) 
 
+        # Botão Salvar
         self.pushButton_Entrar = QPushButton(self.frame)
         self.pushButton_Entrar.setObjectName(u"pushButton_Entrar")
         self.pushButton_Entrar.setGeometry(630, 610, 131, 41)
@@ -81,6 +85,7 @@ class Ui_tela_add_contato(object):
         self.pushButton_Entrar.setFont(font1)
         self.pushButton_Entrar.setStyleSheet(u"color: rgb(255, 255, 255); background-color: rgb(0, 0, 255);")
         
+        # Botão Voltar
         self.pushButton_Entrar_2 = QPushButton(self.frame)
         self.pushButton_Entrar_2.setObjectName(u"pushButton_Entrar_2")
         self.pushButton_Entrar_2.setGeometry(620, 10, 131, 41)
@@ -91,7 +96,7 @@ class Ui_tela_add_contato(object):
 
         self.retranslateUi(tela_add_contato)
         
-        
+        self.pushButton_Entrar.clicked.connect(self.salvar_contato)  # Salvar contato
         self.pushButton_Entrar_2.clicked.connect(lambda: self.voltar_para_contatos(tela_add_contato, main_window))
 
         QMetaObject.connectSlotsByName(tela_add_contato)
@@ -107,9 +112,34 @@ class Ui_tela_add_contato(object):
         self.pushButton_Entrar.setText(QCoreApplication.translate("tela_add_contato", u"Salvar", None))
         self.pushButton_Entrar_2.setText(QCoreApplication.translate("tela_add_contato", u"Voltar", None))
 
+    def salvar_contato(self):
+        nome = self.line_nome.text()
+        contato = self.line_contato.text()
+        email = self.line_email.text()
+        data_nascimento = self.dateEdit_Data_nascimento.date().toString("dd/MM/yyyy")
+        perfil_rede_social = self.line_perfil_rede_social.text()
+        notas = self.textEdit_notas.toPlainText()
+
+        # Não há mais validação obrigatória para o campo "Contato"
+        
+        # Caso contrário, realizar o salvamento (logica para salvar no banco de dados ou outro)
+        print(f"Nome: {nome}, Contato: {contato}, Email: {email}, Data Nascimento: {data_nascimento}, Perfil de Rede Social: {perfil_rede_social}, Notas: {notas}")
+
+        # Após o salvamento, você pode limpar os campos ou voltar para a tela anterior
+        self.voltar_para_contatos(None, None)  # Exemplo de ação após salvar
+
+    def mostrar_mensagem_erro(self, mensagem):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)  # Ícone de erro
+        msg.setText(mensagem)  # Mensagem que será exibida
+        msg.setWindowTitle("Erro")  # Título da janela
+        msg.exec()  # Exibe a janela de erro
+
     def voltar_para_contatos(self, tela_add_contato, main_window):
-        tela_add_contato.close()  
-         
+        # Caso não seja passada a tela, não faz nada
+        if tela_add_contato:
+            tela_add_contato.close()  # Fecha a tela de adicionar contato
+        
 
 if __name__ == "__main__":
     app = QApplication([])  # Criação da aplicação
@@ -117,4 +147,4 @@ if __name__ == "__main__":
     ui = Ui_tela_add_contato()  # Instancia a tela de adicionar contato
     ui.setupUi(MainWindow, MainWindow)  # Configura a interface de adicionar contato e passa a main_window
     MainWindow.show()  # Exibe a janela principal
-    app.exec()  # Inicia o loop de eventos da aplicação
+    app.exec()

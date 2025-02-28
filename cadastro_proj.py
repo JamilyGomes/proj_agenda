@@ -91,14 +91,6 @@ class Ui_Tela_Cadastro(object):
         self.line_contato.setGeometry(QRect(100, 280, 551, 22))
         self.line_contato.setInputMask("(99) 99999-9999")
 
-        # # Asterisco para Contato
-        # self.asterisco_contato = QLabel(self.frame)
-        # self.asterisco_contato.setObjectName(u"asterisco_contato")
-        # self.asterisco_contato.setGeometry(QRect(151, 260, 10, 16))
-        # self.asterisco_contato.setText("*")
-        # self.asterisco_contato.setFont(QFont("Arial", 12))
-        # self.asterisco_contato.setStyleSheet("color: red;")
-
         # Campo de Senha
         self.txt_senha = QLabel(self.frame)
         self.txt_senha.setObjectName(u"txt_senha")
@@ -195,7 +187,7 @@ class Ui_Tela_Cadastro(object):
         if senha != confirmar_senha:
             QMessageBox.warning(None, "Erro", "As senhas não coincidem. Tente novamente.")
         elif nome == "" or email == "" or contato == "" or senha == "" or confirmar_senha == "":
-            QMessageBox.warning(None, "Erro", "Preencha todos os campos.")
+            QMessageBox.warning(None, "Erro", "Preencha todos os campos obrigatórios.")
             self.validar_campos_vazios(nome, email, contato, senha, confirmar_senha)
         else:
             QMessageBox.information(None, "Sucesso", "Cadastro realizado com sucesso!")
