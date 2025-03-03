@@ -1,6 +1,6 @@
-from PySide6.QtCore import QCoreApplication, QMetaObject, QRect, Qt, QSortFilterProxyModel, QStringListModel
+from PySide6.QtCore import QCoreApplication, QMetaObject, QRect, Qt
 from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QApplication, QFrame, QLabel, QLineEdit, QListView, QMainWindow
+from PySide6.QtWidgets import QApplication, QFrame, QLabel, QLineEdit, QListView, QMainWindow, QTextEdit, QPushButton
 from add_cntt import Ui_tela_add_contato
 
 class Ui_Form(object):
@@ -24,61 +24,80 @@ class Ui_Form(object):
         self.line_buscar_cntt.setGeometry(QRect(30, 40, 181, 22))
         self.line_buscar_cntt.setPlaceholderText("Buscar Contatos...")
 
-        self.list_cntt = QListView(self.frame_principal_cntt)
-        self.list_cntt.setObjectName(u"list_cntt")
-        self.list_cntt.setGeometry(QRect(30, 80, 591, 291))
-
-        # Lista de contatos
         self.contatos = ["Abgail", "Bento", "João", "Maria"]
+        self.labels_contatos = []
+        self.chat_histories = {contato: [] for contato in self.contatos}  
 
-        # Criando o modelo de string
-        self.model = QStringListModel()
-        self.model.setStringList(self.contatos)
+        y_positions = [90, 130, 170, 210]
+        for i, nome in enumerate(self.contatos):
+            label = QLabel(self.frame_principal_cntt)
+            label.setObjectName(f"label_{nome}")
+            label.setGeometry(QRect(40, y_positions[i], 50, 16))
+            label.setText(nome)
+            self.labels_contatos.append(label)
+            label.mousePressEvent = lambda event, n=nome: self.abrir_chat(n)  # Abre o chat ao clicar no contato
 
-        # Criando o filtro para a lista de contatos
-        self.proxy_model = QSortFilterProxyModel()
-        self.proxy_model.setSourceModel(self.model)
-        self.proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        # Área do Chat
+        self.frame_chat = QFrame(Form)
+        self.frame_chat.setObjectName("frame_chat")
+        self.frame_chat.setGeometry(QRect(170, 500, 651, 150))
+        self.frame_chat.setStyleSheet("background-color: lightgray;")
+        self.frame_chat.setVisible(False)  # Oculta o chat até que um contato seja selecionado
 
-        # Definindo o modelo da QListView
-        self.list_cntt.setModel(self.proxy_model)
+        self.label_chat = QLabel(self.frame_chat)
+        self.label_chat.setObjectName("label_chat")
+        self.label_chat.setGeometry(QRect(10, 10, 150, 20))
+        self.label_chat.setText("Chat com: ")
 
-        self.line_buscar_cntt.textChanged.connect(self.filtrar_contatos)
+        self.chat_area = QTextEdit(self.frame_chat)
+        self.chat_area.setObjectName("chat_area")
+        self.chat_area.setGeometry(QRect(10, 40, 500, 80))
+        self.chat_area.setReadOnly(True)
+
+        self.input_mensagem = QLineEdit(self.frame_chat)
+        self.input_mensagem.setObjectName("input_mensagem")
+        self.input_mensagem.setGeometry(QRect(10, 130, 420, 20))
+
+        self.botao_enviar = QPushButton(self.frame_chat)
+        self.botao_enviar.setObjectName("botao_enviar")
+        self.botao_enviar.setGeometry(QRect(440, 130, 70, 20))
+        self.botao_enviar.setText("Enviar")
+        self.botao_enviar.clicked.connect(self.enviar_mensagem)
+
+        self.contato_atual = None  # Armazena o contato atualmente selecionado
 
         self.retranslateUi(Form)
         QMetaObject.connectSlotsByName(Form)
 
-        # Ícone de adicionar contato
-        self.label_add = QLabel(self.frame_principal_cntt)
-        self.label_add.setObjectName(u"label_add")
-        self.label_add.setGeometry(QRect(580, 40, 31, 31))
-        self.label_add.setPixmap(QPixmap(u"xx.png"))
-        self.label_add.setScaledContents(True)
-        self.label_add.mousePressEvent = self.adicionar_contato
-
     def retranslateUi(self, Form):
-        Form.setWindowTitle(QCoreApplication.translate("Form", u"Contatos", None))
-        self.label_Cntt.setText(QCoreApplication.translate("Form", u"Contatos", None))
+        Form.setWindowTitle(QCoreApplication.translate("Form", "Contatos", None))
+        self.label_Cntt.setText(QCoreApplication.translate("Form", "Contatos", None))
 
-    def filtrar_contatos(self):
-        texto_busca = self.line_buscar_cntt.text()
-        self.proxy_model.setFilterFixedString(texto_busca)
+    def abrir_chat(self, contato):
+        """ Exibe o chat do contato selecionado. """
+        self.contato_atual = contato
+        self.frame_chat.setVisible(True)
+        self.label_chat.setText(f"Chat com: {contato}")
+        self.exibir_historico_chat()
 
-    def editar_contato(self, i):
-        contato = self.contatos[i]
-        print(f"Editando contato: {contato}")
+    def exibir_historico_chat(self):
+        """ Atualiza a área de texto com o histórico do chat do contato atual. """
+        if self.contato_atual:
+            self.chat_area.setText("\n".join(self.chat_histories[self.contato_atual]))
 
-    def adicionar_contato(self, event):
-        self.tela_add_contato = QMainWindow()
-        self.ui_add_contato = Ui_tela_add_contato()
-        self.ui_add_contato.setupUi(self.tela_add_contato, self.tela_add_contato)
-        self.tela_add_contato.show()
-        event.accept()
+    def enviar_mensagem(self):
+        """ Envia a mensagem e adiciona ao histórico do contato. """
+        if self.contato_atual:
+            mensagem = self.input_mensagem.text().strip()
+            if mensagem:
+                self.chat_histories[self.contato_atual].append(f"Você: {mensagem}")
+                self.input_mensagem.clear()
+                self.exibir_historico_chat()
 
 if __name__ == "__main__":
-    app = QApplication([])  # Criação da aplicação
-    MainWindow = QMainWindow()  # Criação da janela principal
-    ui = Ui_Form()  # Instancia a tela principal
-    ui.setupUi(MainWindow)  # Configura a interface da tela principal
-    MainWindow.show()  # Exibe a janela principal
-    app.exec()  # Inicia o loop de eventos da aplicação
+    app = QApplication([])  
+    MainWindow = QMainWindow()  
+    ui = Ui_Form()  
+    ui.setupUi(MainWindow)  
+    MainWindow.show()  
+    app.exec()  

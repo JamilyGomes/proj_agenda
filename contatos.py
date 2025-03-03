@@ -3,6 +3,7 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication, QFrame, QLabel, QLineEdit, QListView, QMainWindow
 from add_cntt import Ui_tela_add_contato
 from PySide6.QtCore import QSortFilterProxyModel, QStringListModel
+from editarcntt import Ui_Form as Ui_EditarContato  # Importando a tela de edição
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -109,6 +110,21 @@ class Ui_Form(object):
     def editar_contato(self, i):
         contato = self.contatos[i]
         print(f"Editando contato: {contato}")
+        
+        # Passando as informações do contato selecionado para a tela de edição
+        contato_info = {
+            "nome": contato,
+            "contato": "(11) 99999-9999",  # Exemplo de contato
+            "email": "exemplo@email.com",
+            "rede_social": "@exemplo",
+            "notas": "Notas do contato"
+        }
+        
+        # Abrindo a tela de edição
+        self.tela_editar_contato = QMainWindow()
+        self.ui_editar_contato = Ui_EditarContato()
+        self.ui_editar_contato.setupUi(self.tela_editar_contato, contato_info)  # Passando as informações
+        self.tela_editar_contato.show()
 
     def adicionar_contato(self, event):
         self.tela_add_contato = QMainWindow()
