@@ -35,14 +35,14 @@ class Ui_Form(object):
             label.setGeometry(QRect(40, y_positions[i], 50, 16))
             label.setText(nome)
             self.labels_contatos.append(label)
-            label.mousePressEvent = lambda event, n=nome: self.abrir_chat(n)  # Abre o chat ao clicar no contato
+            label.mousePressEvent = lambda event, n=nome: self.abrir_chat(n)  
 
         # Área do Chat
         self.frame_chat = QFrame(Form)
         self.frame_chat.setObjectName("frame_chat")
         self.frame_chat.setGeometry(QRect(170, 500, 651, 150))
         self.frame_chat.setStyleSheet("background-color: lightgray;")
-        self.frame_chat.setVisible(False)  # Oculta o chat até que um contato seja selecionado
+        self.frame_chat.setVisible(False) 
 
         self.label_chat = QLabel(self.frame_chat)
         self.label_chat.setObjectName("label_chat")
@@ -64,7 +64,7 @@ class Ui_Form(object):
         self.botao_enviar.setText("Enviar")
         self.botao_enviar.clicked.connect(self.enviar_mensagem)
 
-        self.contato_atual = None  # Armazena o contato atualmente selecionado
+        self.contato_atual = None  
 
         self.retranslateUi(Form)
         QMetaObject.connectSlotsByName(Form)
