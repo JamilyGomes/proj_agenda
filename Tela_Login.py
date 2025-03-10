@@ -1,7 +1,9 @@
 from PySide6.QtCore import QCoreApplication, QMetaObject, QRect
 from PySide6.QtGui import QFont, QPixmap
 from PySide6.QtWidgets import QApplication, QFrame, QLabel, QLineEdit, QMainWindow, QPushButton, QWidget, QMessageBox
- 
+import mysql.connector
+from bancodedados import autenticar_usuario
+
 class Ui_Tela_Login(object):
     def setupUi(self, Tela_Login):
         if not Tela_Login.objectName():
@@ -95,43 +97,49 @@ class Ui_Tela_Login(object):
         self.pushButton_Entrar.setText(QCoreApplication.translate("Tela_Login", u"Entrar", None))
 
     def abrir_tela_cadastro(self, event):
-        from cadastro_proj import Ui_Tela_Cadastro  # Importe a tela de cadastro
-        self.window = QMainWindow()  # Crie uma nova janela
-        self.ui = Ui_Tela_Cadastro()  # Instancie a tela de cadastro
-        self.ui.setupUi(self.window)  # Configure a tela de cadastro
-        self.window.show()  # Exiba
+        from cadastro_proj import Ui_Tela_Cadastro  
+        self.window = QMainWindow()  
+        self.ui = Ui_Tela_Cadastro()  
+        self.ui.setupUi(self.window)  
+        self.window.show()  
 
     def realizar_login(self):
-        # Função para realizar o login
+        
         email = self.line_email.text()
         senha = self.line_senha.text()
 
-        # Verificação simples (alterar conforme sua lógica de validação)
-        if email == "betta@example.com" and senha == "123":
-            self.close_window()  # Fechar a janela de login
-            self.open_contact_screen()  # Chama a função para abrir a tela de contatos
+        
+        # Verifica no banco se o usuário existe
+        autenticado, nome_usuario = autenticar_usuario(email, senha)
+
+        if autenticado:
+            QMessageBox.information(None, "Sucesso", f"Bem-vindo, {nome_usuario}!")
+            self.centralwidget.parent().close()
+            self.open_contact_screen()  # Abre a tela de contatos
         else:
             QMessageBox.warning(None, "Erro", "Email ou senha incorretos. Tente novamente.")
+       
+
 
     def close_window(self):
-        # Verifique se a janela principal foi passada para a classe
+       
         if hasattr(self, 'window'):
-            self.window.close()  # Fechar a janela principal
+            self.window.close() 
         else:
             print("Erro: A janela principal não foi inicializada corretamente.")
 
     def open_contact_screen(self):
-        # Esta função abre a tela de contatos (a segunda tela que você forneceu)
-        from contatos import Ui_Form  # Importe a tela de contatos
-        self.window = QMainWindow()  # Crie uma nova janela
-        self.ui = Ui_Form()  # Instancie a tela de contatos
-        self.ui.setupUi(self.window)  # Configure a tela de contatos
-        self.window.show()  # Exiba a tela de contatos
+        
+        from contatos import Ui_Form  
+        self.window = QMainWindow()  
+        self.ui = Ui_Form()  
+        self.ui.setupUi(self.window)  
+        self.window.show()  
 
 if __name__ == "__main__":
-    app = QApplication([])  # Criação da aplicação
-    MainWindow = QMainWindow()  # Criação da janela principal
-    ui = Ui_Tela_Login()  # Instancia a tela de login
-    ui.setupUi(MainWindow)  # Configura a interface de login
-    MainWindow.show()  # Exibe a janela principal
-    app.exec()  # Inicia o loop de eventos da aplicação
+    app = QApplication([])  
+    MainWindow = QMainWindow()  
+    ui = Ui_Tela_Login()  
+    ui.setupUi(MainWindow)  
+    MainWindow.show()  
+    app.exec()  
