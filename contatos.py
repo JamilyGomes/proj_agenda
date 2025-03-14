@@ -4,8 +4,13 @@ from PySide6.QtWidgets import QApplication, QFrame, QLabel, QLineEdit, QListView
 from add_cntt import Ui_tela_add_contato
 from PySide6.QtCore import QSortFilterProxyModel, QStringListModel
 from editarcntt import Ui_Form as Ui_EditarContato  # Importando a tela de edição
+from bancodedados import salvar_contato
+
 
 class Ui_Form(object):
+    def __init__(self, usuario_id):
+        self.usuario_id = usuario_id
+
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
@@ -98,21 +103,38 @@ class Ui_Form(object):
         self.tela_editar_contato.show()
 
     def adicionar_contato(self, event):
-        # Adicionando um novo contato
-        novo_contato = "Novo Contato"  # Exemplo de nome de contato
-        self.contatos.append(novo_contato)
+        nome_contato = "Novo Contato"  # Aqui pode ser um nome obtido da interface
+        email = ""  # Adicione os valores reais coletados da interface
+        telefone = ""
+        data_nascimento = "2000-01-01"
+        perfil_rede_social = ""
+        notas = ""
+    
+        usuario_id = self.usuario_id  # Aqui você deve passar o ID do usuário logado
 
-        # Atualizando a interface com o novo contato
-        self.atualizar_contatos()
+        # 🔹 Tenta salvar no banco de dados
+        sucesso = salvar_contato(nome_contato, email, telefone, data_nascimento, perfil_rede_social, notas, usuario_id)
 
-        # Chamando a função que atualiza a busca também
-        self.filtrar_contatos()
+        if sucesso:
+            print("✅ Contato salvo no banco de dados!")
 
-        self.tela_add_contato = QMainWindow()
-        self.ui_add_contato = Ui_tela_add_contato()
-        self.ui_add_contato.setupUi(self.tela_add_contato, self.tela_add_contato)
+            # Adiciona à lista local para exibição na interface
+            self.contatos.append(nome_contato)
+            self.atualizar_contatos()
+            self.filtrar_contatos()
+        else:
+            print("❌ Erro ao salvar contato no banco de dados.")
+        self.tela_add_contato = QMainWindow()  # Cria uma nova janela
+        self.ui_add_contato = Ui_tela_add_contato()  # Cria a interface da tela de adicionar
+        self.ui_add_contato.setupUi(self.tela_add_contato, self)  # Passa a janela principal para a tela de adicionar contato
+
+        # Exibe a tela de adicionar o contato
         self.tela_add_contato.show()
+                
+
         event.accept()
+
+
 
     def atualizar_contatos(self):
         # Remover todos os widgets antigos
@@ -157,7 +179,7 @@ class Ui_Form(object):
 if __name__ == "__main__":
     app = QApplication([])
     MainWindow = QMainWindow()
-    ui = Ui_Form()
+    ui = Ui_Form(usuario_id)
     ui.setupUi(MainWindow)
     MainWindow.show()
     app.exec()

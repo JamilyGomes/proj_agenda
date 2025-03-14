@@ -161,3 +161,4 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)  # Configura a interface gráfica na janela principal
     MainWindow.show()  # Exibe a janela principal
     app.exec()  # Inicia o loop de eventos da aplicação
+

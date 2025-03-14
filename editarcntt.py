@@ -104,3 +104,4 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow, contato_exemplo)
     MainWindow.show()
     app.exec()
+
