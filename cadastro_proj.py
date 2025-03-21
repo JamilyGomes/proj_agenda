@@ -1,240 +1,434 @@
-from PySide6.QtCore import QCoreApplication, QMetaObject, QRect
-from PySide6.QtGui import QFont
-from PySide6.QtWidgets import QApplication, QFrame, QLabel, QLineEdit, QMainWindow, QPushButton, QWidget, QMessageBox
+from PySide6.QtCore import QCoreApplication, QMetaObject, QRect, Qt
+from PySide6.QtGui import QFont, QPixmap
+from PySide6.QtWidgets import QApplication, QFrame, QLabel, QLineEdit, QMainWindow, QPushButton, QWidget, QMessageBox, QFileDialog, QScrollArea, QVBoxLayout
 from bancodedados import salvar_usuario
 
 class Ui_Tela_Cadastro(object):
     def setupUi(self, Tela_Cadastro):
         if not Tela_Cadastro.objectName():
-            Tela_Cadastro.setObjectName(u"Tela_Cadastro")
+            Tela_Cadastro.setObjectName("Tela_Cadastro")
         Tela_Cadastro.resize(800, 600)
+
         self.centralwidget = QWidget(Tela_Cadastro)
-        self.centralwidget.setObjectName(u"centralwidget")
-        self.frame = QFrame(self.centralwidget)
-        self.frame.setObjectName(u"frame")
-        self.frame.setGeometry(QRect(-10, 0, 811, 601))
-        font = QFont()
-        font.setPointSize(12)
+        self.centralwidget.setStyleSheet("""
+            background: qlineargradient(
+                x1: 0, y1: 0, x2: 1, y2: 1,
+                stop: 0 rgb(20, 20, 30),
+                stop: 1 rgb(50, 60, 80)
+            );
+        """)
+        Tela_Cadastro.setCentralWidget(self.centralwidget)
+
+        # Área de rolagem
+        self.scroll_area = QScrollArea(self.centralwidget)
+        self.scroll_area.setGeometry(QRect(0, 0, 800, 600))
+        self.scroll_area.setWidgetResizable(True)
+
+        # Widget de conteúdo dentro da área de rolagem
+        self.scroll_widget = QWidget()
+        self.scroll_widget.setMinimumHeight(700)  # Mantido para caber o conteúdo
+        self.scroll_area.setWidget(self.scroll_widget)
+
+        # Frame dentro do widget de rolagem
+        self.frame = QFrame(self.scroll_widget)
+        self.frame.setGeometry(QRect(150, 50, 500, 650))
+        font = QFont("Segoe UI", 12)
         self.frame.setFont(font)
-        self.frame.setStyleSheet(u"background-color: rgb(255, 255, 255);")
-        self.frame.setFrameShape(QFrame.Shape.StyledPanel)
-        self.frame.setFrameShadow(QFrame.Shadow.Raised)
-        
-        
-        self.txt_Criar_Conta = QLabel(self.frame)
-        self.txt_Criar_Conta.setObjectName(u"txt_Criar_Conta")
-        self.txt_Criar_Conta.setGeometry(QRect(100, 30, 161, 31))
-        font1 = QFont()
-        font1.setPointSize(16)
-        font1.setBold(True)
-        font1.setItalic(True)
+        self.frame.setStyleSheet("background-color: transparent;")  # Fundo transparente para harmonizar
+
+        # Foto de perfil (inicialmente vazia)
+        self.label_foto = QLabel(self.frame)
+        self.label_foto.setGeometry(QRect(200, 20, 100, 100))
+        self.label_foto.setStyleSheet("border: 1px solid rgb(80, 80, 100); border-radius: 50px;")
+        self.label_foto.setAlignment(Qt.AlignCenter)
+        self.label_foto.setScaledContents(True)
+        self.foto_data = None
+
+        # Botão para selecionar foto
+        self.btn_selecionar_foto = QPushButton("Selecionar Foto", self.frame)
+        self.btn_selecionar_foto.setGeometry(QRect(200, 130, 100, 30))
+        self.btn_selecionar_foto.setFont(QFont("Segoe UI", 10, QFont.Bold))
+        self.btn_selecionar_foto.setStyleSheet("""
+            QPushButton {
+                color: rgb(255, 255, 255);
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 1, y2: 1,
+                    stop: 0 rgb(100, 150, 255),
+                    stop: 1 rgb(70, 100, 200)
+                );
+                border-radius: 5px;
+                padding: 5px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+            QPushButton:hover {
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 1, y2: 1,
+                    stop: 0 rgb(120, 170, 255),
+                    stop: 1 rgb(90, 120, 220)
+                );
+            }
+            QPushButton:pressed {
+                background: rgb(50, 80, 180);
+            }
+        """)
+        self.btn_selecionar_foto.clicked.connect(self.selecionar_foto)
+
+        # Título "Crie sua conta"
+        self.txt_Criar_Conta = QLabel("Crie sua conta", self.frame)
+        self.txt_Criar_Conta.setGeometry(QRect(0, 170, 500, 40))
+        font1 = QFont("Segoe UI", 20, QFont.Bold)
         self.txt_Criar_Conta.setFont(font1)
+        self.txt_Criar_Conta.setStyleSheet("color: rgb(220, 220, 255); background-color: transparent;")
+        self.txt_Criar_Conta.setAlignment(Qt.AlignCenter)
 
-        
-        self.txt_jtemconta = QLabel(self.frame)
-        self.txt_jtemconta.setObjectName(u"txt_jtemconta")
-        self.txt_jtemconta.setGeometry(QRect(100, 60, 121, 16))
-        font2 = QFont()
-        font2.setPointSize(10)
-        font2.setBold(True)
-        font2.setItalic(True)
-        self.txt_jtemconta.setFont(font2)
-
-        
-        self.link_entrar = QLabel(self.frame)
-        self.link_entrar.setObjectName(u"link_entrar")
-        self.link_entrar.setGeometry(QRect(230, 60, 71, 16))
-        self.link_entrar.setFont(font2)
-        self.link_entrar.setStyleSheet(u"color: rgb(0, 0, 255);")
-        self.link_entrar.mousePressEvent = self.abrir_tela_login  # Função para abrir a tela de login
-
-        
-        self.txt_nome = QLabel(self.frame)
-        self.txt_nome.setObjectName(u"txt_nome")
-        self.txt_nome.setGeometry(QRect(100, 140, 121, 16))
+        # Campo Nome
+        self.txt_nome = QLabel("Nome:", self.frame)
+        self.txt_nome.setGeometry(QRect(50, 220, 60, 20))
+        font2 = QFont("Segoe UI", 12)
         self.txt_nome.setFont(font2)
+        self.txt_nome.setStyleSheet("color: rgb(200, 200, 200); background-color: transparent;")
         self.line_nome = QLineEdit(self.frame)
-        self.line_nome.setObjectName(u"line_nome")
-        self.line_nome.setGeometry(QRect(100, 160, 551, 22))
+        self.line_nome.setGeometry(QRect(50, 240, 400, 40))
+        self.line_nome.setStyleSheet("""
+            QLineEdit {
+                background-color: rgb(40, 40, 50);
+                color: rgb(255, 255, 255);
+                border: 1px solid rgb(80, 80, 100);
+                border-radius: 5px;
+                padding: 5px;
+                font-family: Segoe UI;
+                font-size: 12pt;
+            }
+            QLineEdit:focus {
+                border: 1px solid rgb(100, 150, 255);
+            }
+        """)
+        self.asterisco_nome = QLabel("*", self.frame)
+        self.asterisco_nome.setGeometry(QRect(110, 220, 10, 20))
+        self.asterisco_nome.setFont(font2)
+        self.asterisco_nome.setStyleSheet("color: rgb(255, 100, 100); background-color: transparent;")
 
-       
-        self.asterisco_nome = QLabel(self.frame)
-        self.asterisco_nome.setObjectName(u"asterisco_nome")
-        self.asterisco_nome.setGeometry(QRect(140, 140, 10, 16))
-        self.asterisco_nome.setText("*")
-        self.asterisco_nome.setFont(QFont("Arial", 12))
-        self.asterisco_nome.setStyleSheet("color: red;")
-
-        
-        self.txt_email = QLabel(self.frame)
-        self.txt_email.setObjectName(u"txt_email")
-        self.txt_email.setGeometry(QRect(100, 200, 121, 16))
+        # Campo Email
+        self.txt_email = QLabel("Email:", self.frame)
+        self.txt_email.setGeometry(QRect(50, 290, 60, 20))
         self.txt_email.setFont(font2)
+        self.txt_email.setStyleSheet("color: rgb(200, 200, 200); background-color: transparent;")
         self.line_email = QLineEdit(self.frame)
-        self.line_email.setObjectName(u"line_email")
-        self.line_email.setGeometry(QRect(100, 220, 551, 22))
+        self.line_email.setGeometry(QRect(50, 310, 400, 40))
+        self.line_email.setStyleSheet("""
+            QLineEdit {
+                background-color: rgb(40, 40, 50);
+                color: rgb(255, 255, 255);
+                border: 1px solid rgb(80, 80, 100);
+                border-radius: 5px;
+                padding: 5px;
+                font-family: Segoe UI;
+                font-size: 12pt;
+            }
+            QLineEdit:focus {
+                border: 1px solid rgb(100, 150, 255);
+            }
+        """)
+        self.asterisco_email = QLabel("*", self.frame)
+        self.asterisco_email.setGeometry(QRect(110, 290, 10, 20))
+        self.asterisco_email.setFont(font2)
+        self.asterisco_email.setStyleSheet("color: rgb(255, 100, 100); background-color: transparent;")
 
-       
-        self.asterisco_email = QLabel(self.frame)
-        self.asterisco_email.setObjectName(u"asterisco_email")
-        self.asterisco_email.setGeometry(QRect(140, 200, 10, 16))
-        self.asterisco_email.setText("*")
-        self.asterisco_email.setFont(QFont("Arial", 12))
-        self.asterisco_email.setStyleSheet("color: red;")
-
-       
-        self.txt_contato = QLabel(self.frame)
-        self.txt_contato.setObjectName(u"txt_contato")
-        self.txt_contato.setGeometry(QRect(100, 260, 121, 16))
+        # Campo Contato
+        self.txt_contato = QLabel("Contato:", self.frame)
+        self.txt_contato.setGeometry(QRect(50, 360, 60, 20))
         self.txt_contato.setFont(font2)
+        self.txt_contato.setStyleSheet("color: rgb(200, 200, 200); background-color: transparent;")
         self.line_contato = QLineEdit(self.frame)
-        self.line_contato.setObjectName(u"line_contato")
-        self.line_contato.setGeometry(QRect(100, 280, 551, 22))
+        self.line_contato.setGeometry(QRect(50, 380, 400, 40))
         self.line_contato.setInputMask("(99) 99999-9999")
+        self.line_contato.setStyleSheet("""
+            QLineEdit {
+                background-color: rgb(40, 40, 50);
+                color: rgb(255, 255, 255);
+                border: 1px solid rgb(80, 80, 100);
+                border-radius: 5px;
+                padding: 5px;
+                font-family: Segoe UI;
+                font-size: 12pt;
+            }
+            QLineEdit:focus {
+                border: 1px solid rgb(100, 150, 255);
+            }
+        """)
 
-        # # Asterisco para Contato
-        # self.asterisco_contato = QLabel(self.frame)
-        # self.asterisco_contato.setObjectName(u"asterisco_contato")
-        # self.asterisco_contato.setGeometry(QRect(151, 260, 10, 16))
-        # self.asterisco_contato.setText("*")
-        # self.asterisco_contato.setFont(QFont("Arial", 12))
-        # self.asterisco_contato.setStyleSheet("color: red;")
-
-        
-        self.txt_senha = QLabel(self.frame)
-        self.txt_senha.setObjectName(u"txt_senha")
-        self.txt_senha.setGeometry(QRect(100, 320, 121, 16))
+        # Campo Senha
+        self.txt_senha = QLabel("Senha:", self.frame)
+        self.txt_senha.setGeometry(QRect(50, 430, 60, 20))
         self.txt_senha.setFont(font2)
+        self.txt_senha.setStyleSheet("color: rgb(200, 200, 200); background-color: transparent;")
         self.line_senha = QLineEdit(self.frame)
-        self.line_senha.setObjectName(u"line_senha")
-        self.line_senha.setGeometry(QRect(100, 340, 551, 22))
-        self.line_senha.setEchoMode(QLineEdit.Password)  
+        self.line_senha.setGeometry(QRect(50, 450, 400, 40))
+        self.line_senha.setEchoMode(QLineEdit.Password)
+        self.line_senha.setStyleSheet("""
+            QLineEdit {
+                background-color: rgb(40, 40, 50);
+                color: rgb(255, 255, 255);
+                border: 1px solid rgb(80, 80, 100);
+                border-radius: 5px;
+                padding: 5px;
+                font-family: Segoe UI;
+                font-size: 12pt;
+            }
+            QLineEdit:focus {
+                border: 1px solid rgb(100, 150, 255);
+            }
+        """)
+        self.asterisco_senha = QLabel("*", self.frame)
+        self.asterisco_senha.setGeometry(QRect(110, 430, 10, 20))
+        self.asterisco_senha.setFont(font2)
+        self.asterisco_senha.setStyleSheet("color: rgb(255, 100, 100); background-color: transparent;")
 
-        
-        self.asterisco_senha = QLabel(self.frame)
-        self.asterisco_senha.setObjectName(u"asterisco_senha")
-        self.asterisco_senha.setGeometry(QRect(141, 320, 10, 16))
-        self.asterisco_senha.setText("*")
-        self.asterisco_senha.setFont(QFont("Arial", 12))
-        self.asterisco_senha.setStyleSheet("color: red;")
-
-        
-        self.txt_confrimar_senha = QLabel(self.frame)
-        self.txt_confrimar_senha.setObjectName(u"txt_confrimar_senha")
-        self.txt_confrimar_senha.setGeometry(QRect(100, 380, 151, 16))
+        # Campo Confirmação de Senha
+        self.txt_confrimar_senha = QLabel("Confirmar Senha:", self.frame)
+        self.txt_confrimar_senha.setGeometry(QRect(50, 500, 120, 20))
         self.txt_confrimar_senha.setFont(font2)
+        self.txt_confrimar_senha.setStyleSheet("color: rgb(200, 200, 200); background-color: transparent;")
         self.line_Confirmar_senha = QLineEdit(self.frame)
-        self.line_Confirmar_senha.setObjectName(u"line_Confirmar_senha")
-        self.line_Confirmar_senha.setGeometry(QRect(100, 400, 551, 22))
-        self.line_Confirmar_senha.setEchoMode(QLineEdit.Password)  # Ativando o EchoMode para ocultar a confirmação de senha
+        self.line_Confirmar_senha.setGeometry(QRect(50, 520, 400, 40))
+        self.line_Confirmar_senha.setEchoMode(QLineEdit.Password)
+        self.line_Confirmar_senha.setStyleSheet("""
+            QLineEdit {
+                background-color: rgb(40, 40, 50);
+                color: rgb(255, 255, 255);
+                border: 1px solid rgb(80, 80, 100);
+                border-radius: 5px;
+                padding: 5px;
+                font-family: Segoe UI;
+                font-size: 12pt;
+            }
+            QLineEdit:focus {
+                border: 1px solid rgb(100, 150, 255);
+            }
+        """)
+        self.asterisco_conf_senha = QLabel("*", self.frame)
+        self.asterisco_conf_senha.setGeometry(QRect(170, 500, 10, 20))
+        self.asterisco_conf_senha.setFont(font2)
+        self.asterisco_conf_senha.setStyleSheet("color: rgb(255, 100, 100); background-color: transparent;")
 
-        
-        self.asterisco_conf_senha = QLabel(self.frame)
-        self.asterisco_conf_senha.setObjectName(u"asterisco_conf_senha")
-        self.asterisco_conf_senha.setGeometry(QRect(243, 380, 10, 16))
-        self.asterisco_conf_senha.setText("*")
-        self.asterisco_conf_senha.setFont(QFont("Arial", 12))
-        self.asterisco_conf_senha.setStyleSheet("color: red;")
-
-       
-        self.pushButton_Cadastrar = QPushButton(self.frame)
-        self.pushButton_Cadastrar.setObjectName(u"pushButton_Cadastrar")
-        self.pushButton_Cadastrar.setGeometry(QRect(390, 480, 131, 51))
-        font3 = QFont()
-        font3.setBold(True)
-        font3.setItalic(True)
+        # Botão Cadastrar
+        self.pushButton_Cadastrar = QPushButton("Cadastrar", self.frame)
+        self.pushButton_Cadastrar.setGeometry(QRect(350, 570, 100, 40))
+        font3 = QFont("Segoe UI", 12, QFont.Bold)
         self.pushButton_Cadastrar.setFont(font3)
-        self.pushButton_Cadastrar.setStyleSheet(u"color: rgb(255, 255, 255); background-color: rgb(0, 0, 255);")
-        self.pushButton_Cadastrar.clicked.connect(self.realizar_cadastro)  # Função para cadastrar
-   
-        
-        
-        self.pushButton_Voltar = QPushButton(self.frame)
-        self.pushButton_Voltar.setObjectName(u"pushButton_Voltar")
-        self.pushButton_Voltar.setGeometry(QRect(250, 480, 131, 51))
-        self.pushButton_Voltar.setFont(font3)
-        self.pushButton_Voltar.setStyleSheet(u"color: rgb(255, 255, 255); background-color: rgb(255, 0, 0);")
-        self.pushButton_Voltar.setText(QCoreApplication.translate("Tela_Cadastro", u"Voltar", None))
-        self.pushButton_Voltar.clicked.connect(self.voltar_para_login)  # Função para voltar ao login
+        self.pushButton_Cadastrar.setStyleSheet("""
+            QPushButton {
+                color: rgb(255, 255, 255);
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 1, y2: 1,
+                    stop: 0 rgb(100, 150, 255),
+                    stop: 1 rgb(70, 100, 200)
+                );
+                border-radius: 8px;
+                padding: 5px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+            QPushButton:hover {
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 1, y2: 1,
+                    stop: 0 rgb(120, 170, 255),
+                    stop: 1 rgb(90, 120, 220)
+                );
+            }
+            QPushButton:pressed {
+                background: rgb(50, 80, 180);
+            }
+        """)
+        self.pushButton_Cadastrar.setCursor(Qt.PointingHandCursor)
+        self.pushButton_Cadastrar.clicked.connect(lambda: self.realizar_cadastro(Tela_Cadastro))
 
-        
+        # Botão Voltar
+        self.pushButton_Voltar = QPushButton("Voltar", self.frame)
+        self.pushButton_Voltar.setGeometry(QRect(240, 570, 100, 40))
+        self.pushButton_Voltar.setFont(font3)
+        self.pushButton_Voltar.setStyleSheet("""
+            QPushButton {
+                color: rgb(255, 255, 255);
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 1, y2: 1,
+                    stop: 0 rgb(255, 100, 100),
+                    stop: 1 rgb(200, 70, 70)
+                );
+                border-radius: 8px;
+                padding: 5px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+            QPushButton:hover {
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 1, y2: 1,
+                    stop: 0 rgb(255, 120, 120),
+                    stop: 1 rgb(220, 90, 90)
+                );
+            }
+            QPushButton:pressed {
+                background: rgb(180, 50, 50);
+            }
+        """)
+        self.pushButton_Voltar.setCursor(Qt.PointingHandCursor)
+        self.pushButton_Voltar.clicked.connect(lambda: self.voltar_para_login(Tela_Cadastro))
+
+        # Link Entrar
+        self.txt_jtemconta = QLabel("Já tem conta?", self.frame)
+        self.txt_jtemconta.setGeometry(QRect(180, 620, 100, 20))
+        self.txt_jtemconta.setFont(font2)
+        self.txt_jtemconta.setStyleSheet("color: rgb(200, 200, 200); background-color: transparent;")
+        self.link_entrar = QLabel("<a href='#'>Entrar</a>", self.frame)
+        self.link_entrar.setGeometry(QRect(280, 620, 100, 20))
+        self.link_entrar.setFont(font2)
+        self.link_entrar.setStyleSheet("color: rgb(255, 255, 255); text-decoration: underline; background-color: transparent;")
+        self.link_entrar.mousePressEvent = self.abrir_tela_login
+
         self.retranslateUi(Tela_Cadastro)
         QMetaObject.connectSlotsByName(Tela_Cadastro)
 
     def retranslateUi(self, Tela_Cadastro):
-        Tela_Cadastro.setWindowTitle(QCoreApplication.translate("Tela_Cadastro", u"Cadastro de Usuário", None))
-        self.txt_Criar_Conta.setText(QCoreApplication.translate("Tela_Cadastro", u"Criar conta", None))
-        self.txt_jtemconta.setText(QCoreApplication.translate("Tela_Cadastro", u"Já tem uma conta? ", None))
-        self.link_entrar.setText(QCoreApplication.translate("Tela_Cadastro", u"Entrar", None))
-        self.txt_nome.setText(QCoreApplication.translate("Tela_Cadastro", u"Nome:", None))
-        self.txt_email.setText(QCoreApplication.translate("Tela_Cadastro", u"Email:", None))
-        self.txt_contato.setText(QCoreApplication.translate("Tela_Cadastro", u"Contato:", None))
-        self.txt_senha.setText(QCoreApplication.translate("Tela_Cadastro", u"Senha:", None))
-        self.txt_confrimar_senha.setText(QCoreApplication.translate("Tela_Cadastro", u"Confirmação da Senha:", None))
-        self.pushButton_Cadastrar.setText(QCoreApplication.translate("Tela_Cadastro", u"Cadastrar", None))
+        Tela_Cadastro.setWindowTitle("Cadastro de Usuário")
+        self.txt_Criar_Conta.setText("Crie sua conta")
+        self.txt_jtemconta.setText("Já tem conta?")
+        self.link_entrar.setText("Entrar")
+        self.txt_nome.setText("Nome:")
+        self.txt_email.setText("Email:")
+        self.txt_contato.setText("Contato:")
+        self.txt_senha.setText("Senha:")
+        self.txt_confrimar_senha.setText("Confirmar Senha:")
+        self.pushButton_Cadastrar.setText("Cadastrar")
+        self.pushButton_Voltar.setText("Voltar")
+
+    def selecionar_foto(self):
+        arquivo, _ = QFileDialog.getOpenFileName(self.frame, "Selecionar Foto", "", "Imagens (*.png *.jpg *.jpeg)")
+        if arquivo:
+            pixmap = QPixmap(arquivo)
+            self.label_foto.setPixmap(pixmap)
+            with open(arquivo, "rb") as f:
+                self.foto_data = f.read()
 
     def abrir_tela_login(self, event):
-        from Tela_Login import Ui_Tela_Login  
-        self.window = QMainWindow()  
-        self.ui = Ui_Tela_Login() 
-        self.ui.setupUi(self.window)  
-        self.window.show() 
+        from Tela_Login import Ui_Tela_Login
+        self.window = QMainWindow()
+        self.ui = Ui_Tela_Login()
+        self.ui.setupUi()
+        self.window.setCentralWidget(self.ui)
+        self.window.show()
+        self.frame.parent().parent().parent().close()  # Fecha a tela de cadastro
 
-    def voltar_para_login(self):
-        self.abrir_tela_login(None)  
+    def voltar_para_login(self, Tela_Cadastro):
+        self.abrir_tela_login(None)
+        Tela_Cadastro.close()
 
-    
-
-    def realizar_cadastro(self):
+    def realizar_cadastro(self, Tela_Cadastro):
         nome = self.line_nome.text()
         email = self.line_email.text()
         contato = self.line_contato.text()
         senha = self.line_senha.text()
         confirmar_senha = self.line_Confirmar_senha.text()
 
-        
         self.limpar_bordas()
 
-       
         if senha != confirmar_senha:
-            QMessageBox.warning(None, "Erro", "As senhas não coincidem. Tente novamente.")
-        elif nome == "" or email == "" or contato == "" or senha == "":
-             QMessageBox.warning(None, "Erro", "Preencha todos os campos.")
-             self.validar_campos_vazios(nome, email, contato, senha, confirmar_senha)   
+            QMessageBox.warning(None, "Erro", "As senhas não coincidem.")
+        elif nome == "" or email == "" or senha == "":
+            QMessageBox.warning(None, "Erro", "Preencha todos os campos obrigatórios.")
+            self.validar_campos_vazios(nome, email, contato, senha, confirmar_senha)
         else:
-            if salvar_usuario(nome, email, contato, senha):
+            if salvar_usuario(nome, email, contato, senha, self.foto_data):
                 QMessageBox.information(None, "Sucesso", "Cadastro realizado com sucesso!")
-                self.voltar_para_login()
+                self.voltar_para_login(Tela_Cadastro)
             else:
-                QMessageBox.warning(None, "Error", "Erro ao Cadastrar! Tente outro e-mail.")
-
+                QMessageBox.warning(None, "Erro", "Erro ao cadastrar! Verifique os dados.")
 
     def limpar_bordas(self):
-        self.line_nome.setStyleSheet("")
-        self.line_email.setStyleSheet("")
-        self.line_contato.setStyleSheet("")
-        self.line_senha.setStyleSheet("")
-        self.line_Confirmar_senha.setStyleSheet("")
+        self.line_nome.setStyleSheet("""
+            QLineEdit {
+                background-color: rgb(40, 40, 50);
+                color: rgb(255, 255, 255);
+                border: 1px solid rgb(80, 80, 100);
+                border-radius: 5px;
+                padding: 5px;
+                font-family: Segoe UI;
+                font-size: 12pt;
+            }
+            QLineEdit:focus {
+                border: 1px solid rgb(100, 150, 255);
+            }
+        """)
+        self.line_email.setStyleSheet("""
+            QLineEdit {
+                background-color: rgb(40, 40, 50);
+                color: rgb(255, 255, 255);
+                border: 1px solid rgb(80, 80, 100);
+                border-radius: 5px;
+                padding: 5px;
+                font-family: Segoe UI;
+                font-size: 12pt;
+            }
+            QLineEdit:focus {
+                border: 1px solid rgb(100, 150, 255);
+            }
+        """)
+        self.line_contato.setStyleSheet("""
+            QLineEdit {
+                background-color: rgb(40, 40, 50);
+                color: rgb(255, 255, 255);
+                border: 1px solid rgb(80, 80, 100);
+                border-radius: 5px;
+                padding: 5px;
+                font-family: Segoe UI;
+                font-size: 12pt;
+            }
+            QLineEdit:focus {
+                border: 1px solid rgb(100, 150, 255);
+            }
+        """)
+        self.line_senha.setStyleSheet("""
+            QLineEdit {
+                background-color: rgb(40, 40, 50);
+                color: rgb(255, 255, 255);
+                border: 1px solid rgb(80, 80, 100);
+                border-radius: 5px;
+                padding: 5px;
+                font-family: Segoe UI;
+                font-size: 12pt;
+            }
+            QLineEdit:focus {
+                border: 1px solid rgb(100, 150, 255);
+            }
+        """)
+        self.line_Confirmar_senha.setStyleSheet("""
+            QLineEdit {
+                background-color: rgb(40, 40, 50);
+                color: rgb(255, 255, 255);
+                border: 1px solid rgb(80, 80, 100);
+                border-radius: 5px;
+                padding: 5px;
+                font-family: Segoe UI;
+                font-size: 12pt;
+            }
+            QLineEdit:focus {
+                border: 1px solid rgb(100, 150, 255);
+            }
+        """)
 
     def validar_campos_vazios(self, nome, email, contato, senha, confirmar_senha):
-        
         if nome == "":
-            self.line_nome.setStyleSheet("border: 1px solid red;")
+            self.line_nome.setStyleSheet("border: 1px solid rgb(255, 100, 100); border-radius: 5px; padding: 5px;")
         if email == "":
-            self.line_email.setStyleSheet("border: 1px solid red;")
+            self.line_email.setStyleSheet("border: 1px solid rgb(255, 100, 100); border-radius: 5px; padding: 5px;")
         if contato == "":
-            self.line_contato.setStyleSheet("border: 1px solid red;")
+            self.line_contato.setStyleSheet("border: 1px solid rgb(255, 100, 100); border-radius: 5px; padding: 5px;")
         if senha == "":
-            self.line_senha.setStyleSheet("border: 1px solid red;")
+            self.line_senha.setStyleSheet("border: 1px solid rgb(255, 100, 100); border-radius: 5px; padding: 5px;")
         if confirmar_senha == "":
-            self.line_Confirmar_senha.setStyleSheet("border: 1px solid red;")
-
-
+            self.line_Confirmar_senha.setStyleSheet("border: 1px solid rgb(255, 100, 100); border-radius: 5px; padding: 5px;")
 
 if __name__ == "__main__":
-    app = QApplication([])  # Criação da aplicação
-    MainWindow = QMainWindow()  # Criação da janela principal
-    ui = Ui_Tela_Cadastro()  # Instanciando a interface
-    ui.setupUi(MainWindow)  # Configura a interface
-    MainWindow.show()  # Exibe a janela principal
-    app.exec()  # Inicia o loop de eventos da aplicação
+    app = QApplication([])
+    MainWindow = QMainWindow()
+    ui = Ui_Tela_Cadastro()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    app.exec()
