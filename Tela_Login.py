@@ -19,8 +19,8 @@ class Ui_Tela_Login(QWidget):
 
         # Layout principal vertical com espaçadores
         self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(20, 20, 20, 20)
-        self.main_layout.addStretch()  # Espaçador no topo
+        # self.main_layout.setContentsMargins(20, 20, 20, 20)
+        # self.main_layout.addStretch()  # Espaçador no topo
 
         # Frame principal com tamanho fixo e gradiente
         self.frame = QWidget(self)
@@ -32,8 +32,8 @@ class Ui_Tela_Login(QWidget):
                 stop: 1 rgb(50, 60, 80)
             );
         """)
-        self.main_layout.addWidget(self.frame, alignment=Qt.AlignCenter)
-        self.main_layout.addStretch()  # Espaçador na parte inferior
+        # self.main_layout.addWidget(self.frame, alignment=Qt.AlignCenter)###########################################################################################################################
+        # self.main_layout.addStretch()  # Espaçador na parte inferior
 
         # Layout interno do frame
         self.frame_layout = QVBoxLayout(self.frame)
@@ -178,7 +178,7 @@ class TelaLogin(QMainWindow):
         self.setCentralWidget(self.ui)
         self.ui.pushButton_Entrar.clicked.connect(self.realizar_login)
         self.ui.link_cadastrar.clicked.connect(self.abrir_tela_cadastro)
-        self.resize(800, 600)  # Tamanho inicial, mas redimensionável
+        self.setFixedSize(800, 600)  # Define um tamanho fixo para a janela
 
     def realizar_login(self):
         email = self.ui.line_email.text()
