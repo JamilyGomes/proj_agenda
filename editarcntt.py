@@ -1,7 +1,7 @@
 from PySide6.QtCore import QRect, Qt, QDate
-from PySide6.QtGui import QFont, QPixmap
+from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (QMainWindow, QWidget, QFrame, QLabel, QLineEdit, QPushButton, 
-                               QDateEdit, QTextEdit, QMessageBox, QScrollArea, QVBoxLayout, QHBoxLayout, QFileDialog)
+                               QDateEdit, QTextEdit, QMessageBox, QScrollArea, QVBoxLayout, QHBoxLayout)
 from bancodedados import atualizar_contato, deletar_contato
 
 class Ui_Form(object):
@@ -9,7 +9,6 @@ class Ui_Form(object):
         self.tela_editar_contato = tela_editar_contato
         self.contato_info = contato_info
         self.tela_contatos = tela_contatos
-        self.foto_data = contato_info.get("foto")  # Armazenar os dados da foto existente (se houver)
 
         tela_editar_contato.setObjectName("tela_editar_contato")
         tela_editar_contato.resize(800, 600)
@@ -260,59 +259,6 @@ class Ui_Form(object):
         """)
         self.scroll_widget_layout.addWidget(self.line_notas)
 
-        # Campo para a foto do contato
-        self.txt_foto = QLabel("Foto do Contato:")
-        self.txt_foto.setFont(font2)
-        self.txt_foto.setStyleSheet("color: rgb(200, 200, 200);")
-        self.scroll_widget_layout.addWidget(self.txt_foto)
-
-        self.label_foto_contato = QLabel()
-        self.label_foto_contato.setFixedSize(100, 100)
-        self.label_foto_contato.setStyleSheet("""
-            border: 1px solid rgb(80, 80, 100);
-            border-radius: 50px;
-            background-color: rgb(40, 40, 50);
-        """)
-        self.label_foto_contato.setAlignment(Qt.AlignCenter)
-        self.label_foto_contato.setScaledContents(True)
-        # Carregar a foto existente (se houver)
-        if self.foto_data:
-            pixmap = QPixmap()
-            pixmap.loadFromData(self.foto_data)
-            self.label_foto_contato.setPixmap(pixmap)
-        else:
-            self.label_foto_contato.setText("Sem Foto")
-        self.scroll_widget_layout.addWidget(self.label_foto_contato)
-
-        self.btn_selecionar_foto = QPushButton("Selecionar Foto")
-        self.btn_selecionar_foto.setFixedSize(120, 30)
-        self.btn_selecionar_foto.setFont(QFont("Segoe UI", 10, QFont.Bold))
-        self.btn_selecionar_foto.setStyleSheet("""
-            QPushButton {
-                color: rgb(255, 255, 255);
-                background: qlineargradient(
-                    x1: 0, y1: 0, x2: 1, y2: 1,
-                    stop: 0 rgb(100, 150, 255),
-                    stop: 1 rgb(70, 100, 200)
-                );
-                border-radius: 5px;
-                padding: 5px;
-            }
-            QPushButton:hover {
-                background: qlineargradient(
-                    x1: 0, y1: 0, x2: 1, y2: 1,
-                    stop: 0 rgb(120, 170, 255),
-                    stop: 1 rgb(90, 120, 220)
-                );
-            }
-            QPushButton:pressed {
-                background: rgb(50, 80, 180);
-            }
-        """)
-        self.btn_selecionar_foto.setCursor(Qt.PointingHandCursor)
-        self.btn_selecionar_foto.clicked.connect(self.selecionar_foto)
-        self.scroll_widget_layout.addWidget(self.btn_selecionar_foto)
-
         # Botões Salvar e Deletar
         self.button_layout = QHBoxLayout()
         self.button_layout.setAlignment(Qt.AlignRight)
@@ -382,17 +328,6 @@ class Ui_Form(object):
         # Adicionar um espaço extra no final
         self.scroll_widget_layout.addSpacing(20)
 
-    def selecionar_foto(self):
-        arquivo, _ = QFileDialog.getOpenFileName(self.centralwidget, "Selecionar Foto", "", "Imagens (*.png *.jpg *.jpeg)")
-        if arquivo:
-            # Carregar a nova foto na interface
-            pixmap = QPixmap(arquivo)
-            self.label_foto_contato.setPixmap(pixmap)
-
-            # Ler os dados da nova foto
-            with open(arquivo, "rb") as f:
-                self.foto_data = f.read()
-
     def salvar_contato(self):
         nome = self.line_nome.text()
         email = self.line_email.text()
@@ -420,7 +355,7 @@ class Ui_Form(object):
             """)
             return
 
-        if atualizar_contato(self.contato_info["id"], nome, email, telefone, data_nascimento_str, perfil_rede_social, notas, self.foto_data):
+        if atualizar_contato(self.contato_info["id"], nome, email, telefone, data_nascimento_str, perfil_rede_social, notas, None):
             QMessageBox.information(None, "Sucesso", "Contato atualizado com sucesso!")
             self.tela_contatos.carregar_contatos()
             self.tela_editar_contato.close()
@@ -437,4 +372,3 @@ class Ui_Form(object):
                 self.tela_editar_contato.close()
             else:
                 QMessageBox.warning(None, "Erro", "Erro ao deletar contato. Tente novamente.")
-

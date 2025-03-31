@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont, QPixmap
 from PySide6.QtWidgets import (QApplication, QMainWindow, QLabel, QLineEdit, 
                                QPushButton, QWidget, QMessageBox, QVBoxLayout, 
-                               QHBoxLayout, QSpacerItem, QSizePolicy)
+                               QHBoxLayout)
 
 from bancodedados import autenticar_usuario
 from contatos import Ui_Form
@@ -15,35 +15,34 @@ class Ui_Tela_Login(QWidget):
 
     def setupUi(self):
         self.setObjectName("Tela_Login")
-        # Removido setFixedSize para permitir maximização
 
-        # Layout principal vertical com espaçadores
+        # Layout principal vertical
         self.main_layout = QVBoxLayout(self)
-        # self.main_layout.setContentsMargins(20, 20, 20, 20)
-        # self.main_layout.addStretch()  # Espaçador no topo
+        self.main_layout.setContentsMargins(20, 20, 20, 20)
+        self.main_layout.setSpacing(15)
 
-        # Frame principal com tamanho fixo e gradiente
+        # Frame principal com gradiente
         self.frame = QWidget(self)
-        self.frame.setFixedSize(800, 600)  # Tamanho fixo do conteúdo
         self.frame.setStyleSheet("""
             background: qlineargradient(
                 x1: 0, y1: 0, x2: 1, y2: 1,
                 stop: 0 rgb(20, 20, 30),
                 stop: 1 rgb(50, 60, 80)
             );
+            border-radius: 10px;
         """)
-        # self.main_layout.addWidget(self.frame, alignment=Qt.AlignCenter)###########################################################################################################################
-        # self.main_layout.addStretch()  # Espaçador na parte inferior
+        self.main_layout.addWidget(self.frame, stretch=1)
 
         # Layout interno do frame
         self.frame_layout = QVBoxLayout(self.frame)
-        self.frame_layout.setContentsMargins(20, 20, 20, 20)
-        self.frame_layout.setSpacing(15)
+        self.frame_layout.setContentsMargins(40, 40, 40, 40)
+        self.frame_layout.setSpacing(20)
         self.frame_layout.setAlignment(Qt.AlignCenter)
 
         # Label para foto
         self.label_foto = QLabel(self.frame)
-        self.label_foto.setFixedSize(100, 100)  # Tamanho fixo
+        self.label_foto.setMinimumSize(100, 100)
+        self.label_foto.setMaximumSize(150, 150)
         self.label_foto.setStyleSheet("""
             border: 1px solid rgb(80, 80, 100);
             border-radius: 50px;
@@ -74,8 +73,7 @@ class Ui_Tela_Login(QWidget):
         self.email_layout.addWidget(self.txt_email)
 
         self.line_email = QLineEdit(self.frame)
-        self.line_email.setFixedHeight(30)  # Altura fixa
-        self.line_email.setMaximumWidth(698)  # Largura máxima
+        self.line_email.setMinimumHeight(30)
         self.line_email.setStyleSheet("""
             QLineEdit {
                 background-color: rgb(40, 40, 50);
@@ -90,7 +88,7 @@ class Ui_Tela_Login(QWidget):
                 border: 1px solid rgb(100, 150, 255);
             }
         """)
-        self.email_layout.addWidget(self.line_email)
+        self.email_layout.addWidget(self.line_email, stretch=1)
         self.frame_layout.addLayout(self.email_layout)
 
         # Campo Senha
@@ -101,8 +99,7 @@ class Ui_Tela_Login(QWidget):
         self.senha_layout.addWidget(self.txt_senha)
 
         self.line_senha = QLineEdit(self.frame)
-        self.line_senha.setFixedHeight(30)  # Altura fixa
-        self.line_senha.setMaximumWidth(800)  # Largura máxima
+        self.line_senha.setMinimumHeight(30)
         self.line_senha.setEchoMode(QLineEdit.EchoMode.Password)
         self.line_senha.setStyleSheet("""
             QLineEdit {
@@ -118,7 +115,7 @@ class Ui_Tela_Login(QWidget):
                 border: 1px solid rgb(100, 150, 255);
             }
         """)
-        self.senha_layout.addWidget(self.line_senha)
+        self.senha_layout.addWidget(self.line_senha, stretch=1)
         self.frame_layout.addLayout(self.senha_layout)
 
         # Botão Entrar
@@ -134,7 +131,7 @@ class Ui_Tela_Login(QWidget):
                     stop: 1 rgb(70, 100, 200)
                 );
                 border-radius: 8px;
-                padding: 5px;
+                padding: 10px;
             }
             QPushButton:hover {
                 background: qlineargradient(
@@ -148,7 +145,7 @@ class Ui_Tela_Login(QWidget):
             }
         """)
         self.pushButton_Entrar.setCursor(Qt.PointingHandCursor)
-        self.pushButton_Entrar.setFixedSize(100, 40)  # Tamanho fixo
+        self.pushButton_Entrar.setMinimumSize(100, 40)
         self.frame_layout.addWidget(self.pushButton_Entrar, alignment=Qt.AlignHCenter)
 
         # Link Cadastre-se
@@ -168,7 +165,7 @@ class Ui_Tela_Login(QWidget):
             }
         """)
         self.link_cadastrar.setCursor(Qt.PointingHandCursor)
-        self.link_cadastrar.setFixedSize(100, 20)  # Tamanho fixo
+        self.link_cadastrar.setMinimumSize(100, 20)
         self.frame_layout.addWidget(self.link_cadastrar, alignment=Qt.AlignHCenter)
 
 class TelaLogin(QMainWindow):
@@ -178,7 +175,8 @@ class TelaLogin(QMainWindow):
         self.setCentralWidget(self.ui)
         self.ui.pushButton_Entrar.clicked.connect(self.realizar_login)
         self.ui.link_cadastrar.clicked.connect(self.abrir_tela_cadastro)
-        self.setFixedSize(800, 600)  # Define um tamanho fixo para a janela
+        self.setMinimumSize(400, 300)  # Tamanho mínimo para responsividade
+        self.resize(800, 600)  # Define o tamanho inicial como 800x600
 
     def realizar_login(self):
         email = self.ui.line_email.text()
