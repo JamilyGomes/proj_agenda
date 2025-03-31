@@ -6,18 +6,21 @@ from PySide6.QtWidgets import (QFrame, QLabel, QLineEdit, QMainWindow, QVBoxLayo
                                QFileDialog, QApplication)
 from add_cntt import Ui_tela_add_contato
 from editarcntt import Ui_Form as Ui_EditarContato
+from chat import Ui_Tela_Chat_Simples  # Import da tela de chat simplificada
 from bancodedados import obter_contatos, obter_foto_usuario, atualizar_foto_usuario
 from datetime import datetime
 
 class Ui_Form(object):
     def __init__(self, usuario_id):
         self.usuario_id = usuario_id
+        self.labels_chat = []  # Lista para os ícones de chat
 
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(988, 579)
         Form.setWindowTitle("Agenda de Contatos")
         Form.setWindowIcon(QIcon("agenda.png"))
+
         # Widget central com gradiente escuro
         self.centralwidget = QWidget(Form)
         self.centralwidget.setStyleSheet("""
@@ -138,7 +141,7 @@ class Ui_Form(object):
 
         # Ícone de adicionar
         self.label_add = QLabel()
-        self.label_add.setPixmap(QPixmap("xx.png"))
+        self.label_add.setPixmap(QPixmap("xx.png"))  # Substitua pelo ícone de adicionar
         self.label_add.setScaledContents(True)
         self.label_add.setFixedSize(32, 32)
         self.label_add.setStyleSheet("""
@@ -152,6 +155,7 @@ class Ui_Form(object):
         self.contatos = []
         self.labels_contatos = []
         self.labels_editar = []
+        self.labels_chat = []  # Lista para os ícones de chat
         self.lines = []
 
         self.line_buscar_cntt.textChanged.connect(self.filtrar_contatos)
@@ -198,6 +202,8 @@ class Ui_Form(object):
             label.setVisible(visivel)
             if i < len(self.labels_editar):
                 self.labels_editar[i].setVisible(visivel)
+            if i < len(self.labels_chat):
+                self.labels_chat[i].setVisible(visivel)
             if i < len(self.lines):
                 self.lines[i].setVisible(visivel)
         self.scroll_widget.adjustSize()
@@ -235,10 +241,13 @@ class Ui_Form(object):
             line.deleteLater()
         for label_editar in self.labels_editar:
             label_editar.deleteLater()
+        for label_chat in self.labels_chat:
+            label_chat.deleteLater()
 
         self.labels_contatos.clear()
         self.lines.clear()
         self.labels_editar.clear()
+        self.labels_chat.clear()
 
         # Adicionar contatos à interface
         for i, contato in enumerate(self.contatos):
@@ -267,15 +276,24 @@ class Ui_Form(object):
             # Botão editar
             label_editar = QLabel()
             label_editar.setObjectName(f"label_editar_{i}")
-            label_editar.setPixmap(QPixmap("yy.png"))
+            label_editar.setPixmap(QPixmap("yy.png"))  # Substitua pelo ícone de editar
             label_editar.setScaledContents(True)
             label_editar.setFixedSize(24, 24)
-            label_editar.setStyleSheet("""
-                background-color: transparent;
-            """)
+            label_editar.setStyleSheet("background-color: transparent;")
             label_editar.mousePressEvent = lambda event, idx=i: self.editar_contato(idx)
             contato_layout.addWidget(label_editar)
             self.labels_editar.append(label_editar)
+
+            # Botão chat
+            label_chat = QLabel()
+            label_chat.setObjectName(f"label_chat_{i}")
+            label_chat.setPixmap(QPixmap("chat_icone.png"))  # Substitua por um ícone de chat
+            label_chat.setScaledContents(True)
+            label_chat.setFixedSize(24, 24)
+            label_chat.setStyleSheet("background-color: transparent;")
+            label_chat.mousePressEvent = lambda event, idx=i: self.abrir_chat(idx)
+            contato_layout.addWidget(label_chat)
+            self.labels_chat.append(label_chat)
 
             self.scroll_layout.addLayout(contato_layout)
 
@@ -287,7 +305,7 @@ class Ui_Form(object):
             self.scroll_layout.addWidget(line)
             self.lines.append(line)
 
-        self.verificar_aniversarios()  # Verifica aniversários após carregar os contatos
+        self.verificar_aniversarios()
 
     def editar_contato(self, i):
         contato = self.contatos[i]
@@ -309,6 +327,26 @@ class Ui_Form(object):
         self.ui_editar_contato.setupUi(self.tela_editar_contato, contato_info, self)
         self.tela_editar_contato.destroyed.connect(self.carregar_contatos)
         self.tela_editar_contato.show()
+
+    def abrir_chat(self, i):
+        contato = self.contatos[i]
+        data_nascimento = contato.get("data_nascimento")
+        data_nascimento_str = data_nascimento.strftime("%Y-%m-%d") if data_nascimento else ""
+        
+        contato_info = {
+            "id": contato.get("id"),
+            "nome": contato.get("nome", "Sem Nome"),
+            "telefone": contato.get("telefone", "Sem Telefone"),
+            "email": contato.get("email", "Sem Email"),
+            "rede_social": contato.get("perfil_rede_social", "Sem Rede Social"),
+            "notas": contato.get("notas", "Sem Notas"),
+            "data_nascimento": data_nascimento_str,
+        }
+
+        self.tela_chat = QMainWindow()
+        self.ui_chat = Ui_Tela_Chat_Simples()
+        self.ui_chat.setupUi(self.tela_chat, self.usuario_id, contato_info, self)
+        self.tela_chat.show()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

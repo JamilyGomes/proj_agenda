@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QFont, QPixmap
+from PySide6.QtGui import QFont, QPixmap, QIcon
 from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit, QMainWindow, 
                                QPushButton, QWidget, QMessageBox, QFileDialog, QScrollArea, 
                                QVBoxLayout, QHBoxLayout)
@@ -7,9 +7,13 @@ from bancodedados import salvar_usuario
 
 class Ui_Tela_Cadastro(object):
     def setupUi(self, Tela_Cadastro):
+        self.foto_data = None  # Garante que a variável existe mesmo se o usuário não selecionar foto
+
         if not Tela_Cadastro.objectName():
             Tela_Cadastro.setObjectName("Tela_Cadastro")
         Tela_Cadastro.resize(800, 600)
+        Tela_Cadastro.setWindowTitle("Agenda de Contatos")
+        Tela_Cadastro.setWindowIcon(QIcon("agenda.png"))
 
         # Widget central com gradiente escuro
         self.centralwidget = QWidget(Tela_Cadastro)
