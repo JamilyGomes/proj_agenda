@@ -34,6 +34,8 @@ class Ui_Tela_Chat_Simples(object):
         self.main_layout.setContentsMargins(20, 20, 20, 20)
         self.main_layout.setSpacing(10)
 
+
+        #arrumar titlee
         # Título
         self.txt_chat = QLabel(f"Chat com {contato_info.get('nome', 'Desconhecido')}")
         font1 = QFont("Segoe UI", 18, QFont.Bold)
