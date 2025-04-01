@@ -1,21 +1,22 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont, QPixmap, QIcon
-from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit, QMainWindow, 
-                               QPushButton, QWidget, QMessageBox, QFileDialog, QScrollArea, 
+from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit, QMainWindow,
+                               QPushButton, QWidget, QMessageBox, QFileDialog, QScrollArea,
                                QVBoxLayout, QHBoxLayout)
-from bancodedados import salvar_usuario
+from dados_locais import salvar_usuario
+from login import TelaLogin
 
 class Ui_Tela_Cadastro(object):
-    def setupUi(self, Tela_Cadastro):
-        self.foto_data = None  # Garante que a variável existe mesmo se o usuário não selecionar foto
+    def __init__(self):
+        self.foto_data = None
 
+    def setupUi(self, Tela_Cadastro):
         if not Tela_Cadastro.objectName():
             Tela_Cadastro.setObjectName("Tela_Cadastro")
         Tela_Cadastro.resize(800, 600)
         Tela_Cadastro.setWindowTitle("Agenda de Contatos")
         Tela_Cadastro.setWindowIcon(QIcon("agenda.png"))
 
-        # Widget central com gradiente escuro
         self.centralwidget = QWidget(Tela_Cadastro)
         self.centralwidget.setStyleSheet("""
             background: qlineargradient(
@@ -26,12 +27,10 @@ class Ui_Tela_Cadastro(object):
         """)
         Tela_Cadastro.setCentralWidget(self.centralwidget)
 
-        # Layout principal (vertical)
         self.main_layout = QVBoxLayout(self.centralwidget)
         self.main_layout.setContentsMargins(20, 20, 20, 20)
         self.main_layout.setSpacing(10)
 
-        # Área de rolagem
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setStyleSheet("""
@@ -58,7 +57,6 @@ class Ui_Tela_Cadastro(object):
         """)
         self.main_layout.addWidget(self.scroll_area)
 
-        # Widget de conteúdo dentro da área de rolagem
         self.scroll_widget = QWidget()
         self.scroll_widget_layout = QVBoxLayout(self.scroll_widget)
         self.scroll_widget_layout.setAlignment(Qt.AlignTop)
@@ -66,7 +64,6 @@ class Ui_Tela_Cadastro(object):
         self.scroll_widget_layout.setContentsMargins(20, 20, 20, 20)
         self.scroll_area.setWidget(self.scroll_widget)
 
-        # Frame dentro do widget de rolagem
         self.frame = QFrame()
         self.frame.setStyleSheet("""
             background-color: rgb(40, 40, 50);
@@ -77,7 +74,6 @@ class Ui_Tela_Cadastro(object):
         self.frame_layout.setSpacing(10)
         self.scroll_widget_layout.addWidget(self.frame)
 
-        # Foto de perfil (inicialmente vazia)
         self.label_foto = QLabel()
         self.label_foto.setFixedSize(100, 100)
         self.label_foto.setStyleSheet("""
@@ -90,7 +86,6 @@ class Ui_Tela_Cadastro(object):
         self.label_foto.setText("Sem Foto")
         self.frame_layout.addWidget(self.label_foto, alignment=Qt.AlignCenter)
 
-        # Botão para selecionar foto
         self.btn_selecionar_foto = QPushButton("Selecionar Foto")
         self.btn_selecionar_foto.setFixedSize(120, 30)
         self.btn_selecionar_foto.setFont(QFont("Segoe UI", 10, QFont.Bold))
@@ -120,7 +115,6 @@ class Ui_Tela_Cadastro(object):
         self.btn_selecionar_foto.clicked.connect(self.selecionar_foto)
         self.frame_layout.addWidget(self.btn_selecionar_foto, alignment=Qt.AlignCenter)
 
-        # Título
         self.txt_Criar_Conta = QLabel("Crie sua conta")
         font1 = QFont("Segoe UI", 18, QFont.Bold)
         self.txt_Criar_Conta.setFont(font1)
@@ -131,7 +125,6 @@ class Ui_Tela_Cadastro(object):
         self.txt_Criar_Conta.setAlignment(Qt.AlignCenter)
         self.frame_layout.addWidget(self.txt_Criar_Conta)
 
-        # Campo Nome
         self.txt_nome = QLabel("Nome:")
         font2 = QFont("Segoe UI", 12)
         self.txt_nome.setFont(font2)
@@ -161,7 +154,6 @@ class Ui_Tela_Cadastro(object):
         self.asterisco_nome.setStyleSheet("color: rgb(255, 100, 100);")
         self.frame_layout.addWidget(self.asterisco_nome)
 
-        # Campo Email
         self.txt_email = QLabel("Email:")
         self.txt_email.setFont(font2)
         self.txt_email.setStyleSheet("color: rgb(200, 200, 200);")
@@ -190,7 +182,6 @@ class Ui_Tela_Cadastro(object):
         self.asterisco_email.setStyleSheet("color: rgb(255, 100, 100);")
         self.frame_layout.addWidget(self.asterisco_email)
 
-        # Campo Contato
         self.txt_contato = QLabel("Contato:")
         self.txt_contato.setFont(font2)
         self.txt_contato.setStyleSheet("color: rgb(200, 200, 200);")
@@ -215,7 +206,6 @@ class Ui_Tela_Cadastro(object):
         """)
         self.frame_layout.addWidget(self.line_contato)
 
-        # Campo Senha
         self.txt_senha = QLabel("Senha:")
         self.txt_senha.setFont(font2)
         self.txt_senha.setStyleSheet("color: rgb(200, 200, 200);")
@@ -245,7 +235,6 @@ class Ui_Tela_Cadastro(object):
         self.asterisco_senha.setStyleSheet("color: rgb(255, 100, 100);")
         self.frame_layout.addWidget(self.asterisco_senha)
 
-        # Campo Confirmação de Senha
         self.txt_confrimar_senha = QLabel("Confirmar Senha:")
         self.txt_confrimar_senha.setFont(font2)
         self.txt_confrimar_senha.setStyleSheet("color: rgb(200, 200, 200);")
@@ -275,7 +264,6 @@ class Ui_Tela_Cadastro(object):
         self.asterisco_conf_senha.setStyleSheet("color: rgb(255, 100, 100);")
         self.frame_layout.addWidget(self.asterisco_conf_senha)
 
-        # Botões Cadastrar e Voltar
         self.button_layout = QHBoxLayout()
         self.button_layout.setAlignment(Qt.AlignRight)
         self.button_layout.setSpacing(10)
@@ -341,7 +329,6 @@ class Ui_Tela_Cadastro(object):
 
         self.frame_layout.addLayout(self.button_layout)
 
-        # Link Entrar
         self.link_layout = QHBoxLayout()
         self.link_layout.setAlignment(Qt.AlignCenter)
         self.link_layout.setSpacing(5)
@@ -351,7 +338,7 @@ class Ui_Tela_Cadastro(object):
         self.txt_jtemconta.setStyleSheet("color: rgb(200, 200, 200);")
         self.link_layout.addWidget(self.txt_jtemconta)
 
-        self.link_entrar = QLabel("<a href='#'>Entrar</a>")
+        self.link_entrar = QLabel("Entrar")
         self.link_entrar.setFont(font2)
         self.link_entrar.setStyleSheet("""
             color: rgb(220, 220, 255);
@@ -363,7 +350,6 @@ class Ui_Tela_Cadastro(object):
 
         self.frame_layout.addLayout(self.link_layout)
 
-        # Adicionar um espaço extra no final
         self.frame_layout.addSpacing(20)
 
         self.retranslateUi(Tela_Cadastro)
@@ -390,7 +376,6 @@ class Ui_Tela_Cadastro(object):
                 self.foto_data = f.read()
 
     def abrir_tela_login(self, Tela_Cadastro):
-        from Tela_Login import TelaLogin
         self.tela_login = TelaLogin()
         self.tela_login.show()
         Tela_Cadastro.close()
